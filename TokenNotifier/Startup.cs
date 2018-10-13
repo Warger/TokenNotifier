@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-
+using TokenNotifier.Data;
 
 namespace TokenNotifier
 {
@@ -33,11 +33,10 @@ namespace TokenNotifier
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddDbContext<DbCryptoContext>
+               (options => options.UseMySql(Configuration.GetConnectionString("TokenNotifierContext")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            services.AddDbContext<DbContext>
-                (options => options.UseMySQL(Configuration.GetConnectionString("TokenNotifierContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

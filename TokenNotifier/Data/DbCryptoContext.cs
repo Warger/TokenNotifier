@@ -9,7 +9,7 @@ namespace TokenNotifier.Data
 {
     public class DbCryptoContext : DbContext
     {
-        public DbCryptoContext(DbContextOptions<DbContext> options)
+        public DbCryptoContext(DbContextOptions options)
         : base(options)
         {
         }

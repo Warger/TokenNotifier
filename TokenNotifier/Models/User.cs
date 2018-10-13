@@ -7,5 +7,11 @@ namespace TokenNotifier.Models
 {
     public class User
     {
+        public int UserID { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+
+        public User()
+        { }
     }
 }

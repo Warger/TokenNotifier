@@ -7,5 +7,10 @@ namespace TokenNotifier.Models
 {
     public class Wallet
     {
+        public int WalletID { get; set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+        public double Value { get; set; }
+        public Token LinkedToken { get; set; }
     }
 }
