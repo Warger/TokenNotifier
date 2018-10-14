@@ -7,28 +7,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
+using X.PagedList;
 
 namespace TokenNotifier.Controllers
 {
-    public class UsersController : Controller
+    public class TransfersController : Controller
     {
         private readonly DbCryptoContext _context;
 
-        public UsersController(DbCryptoContext context)
+        public TransfersController(DbCryptoContext context)
         {
             _context = context;
         }
 
-        // GET: Users
-        public async Task<IActionResult> Index()
+        // GET: Transfers
+        public async Task<IActionResult> Index(int? page)
         {
-            //  DbInitializer.Initialize(_context);
-            Parser.Parser p = new Parser.Parser();
-            p.Update(_context);
-            return View(await _context.Users.ToListAsync());
+            int pageSize = 50;
+            int pageNumber = (page ?? 1);
+            return View(_context.Transfers.ToPagedList(pageNumber, pageSize));
         }
 
-        // GET: Users/Details/5
+        // GET: Transfers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,39 +36,39 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var transfer = await _context.Transfers
+                .FirstOrDefaultAsync(m => m.TrasferID == id);
+            if (transfer == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(transfer);
         }
 
-        // GET: Users/Create
+        // GET: Transfers/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
+        // POST: Transfers/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Create([Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue,TransactionHash")] Transfer transfer)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                _context.Add(transfer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(transfer);
         }
 
-        // GET: Users/Edit/5
+        // GET: Transfers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,22 +76,22 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var transfer = await _context.Transfers.FindAsync(id);
+            if (transfer == null)
             {
                 return NotFound();
             }
-            return View(user);
+            return View(transfer);
         }
 
-        // POST: Users/Edit/5
+        // POST: Transfers/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue,TransactionHash")] Transfer transfer)
         {
-            if (id != user.UserID)
+            if (id != transfer.TrasferID)
             {
                 return NotFound();
             }
@@ -100,12 +100,12 @@ namespace TokenNotifier.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(transfer);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserID))
+                    if (!TransferExists(transfer.TrasferID))
                     {
                         return NotFound();
                     }
@@ -116,10 +116,10 @@ namespace TokenNotifier.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(transfer);
         }
 
-        // GET: Users/Delete/5
+        // GET: Transfers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -127,30 +127,30 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var transfer = await _context.Transfers
+                .FirstOrDefaultAsync(m => m.TrasferID == id);
+            if (transfer == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(transfer);
         }
 
-        // POST: Users/Delete/5
+        // POST: Transfers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            _context.Users.Remove(user);
+            var transfer = await _context.Transfers.FindAsync(id);
+            _context.Transfers.Remove(transfer);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool TransferExists(int id)
         {
-            return _context.Users.Any(e => e.UserID == id);
+            return _context.Transfers.Any(e => e.TrasferID == id);
         }
     }
 }

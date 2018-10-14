@@ -10,25 +10,22 @@ using TokenNotifier.Models;
 
 namespace TokenNotifier.Controllers
 {
-    public class UsersController : Controller
+    public class TokensController : Controller
     {
         private readonly DbCryptoContext _context;
 
-        public UsersController(DbCryptoContext context)
+        public TokensController(DbCryptoContext context)
         {
             _context = context;
         }
 
-        // GET: Users
+        // GET: Tokens
         public async Task<IActionResult> Index()
         {
-            //  DbInitializer.Initialize(_context);
-            Parser.Parser p = new Parser.Parser();
-            p.Update(_context);
-            return View(await _context.Users.ToListAsync());
+            return View(await _context.Tokens.ToListAsync());
         }
 
-        // GET: Users/Details/5
+        // GET: Tokens/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,39 +33,39 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var token = await _context.Tokens
+                .FirstOrDefaultAsync(m => m.TokenID == id);
+            if (token == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(token);
         }
 
-        // GET: Users/Create
+        // GET: Tokens/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
+        // POST: Tokens/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Create([Bind("TokenID,Decimals,Name,ShortName,Contract,IsObserved,PercentForNotification,TotalSupply")] Token token)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                _context.Add(token);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(token);
         }
 
-        // GET: Users/Edit/5
+        // GET: Tokens/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,22 +73,22 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var token = await _context.Tokens.FindAsync(id);
+            if (token == null)
             {
                 return NotFound();
             }
-            return View(user);
+            return View(token);
         }
 
-        // POST: Users/Edit/5
+        // POST: Tokens/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("TokenID,Decimals,Name,ShortName,Contract,IsObserved,PercentForNotification,TotalSupply")] Token token)
         {
-            if (id != user.UserID)
+            if (id != token.TokenID)
             {
                 return NotFound();
             }
@@ -100,12 +97,12 @@ namespace TokenNotifier.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(token);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserID))
+                    if (!TokenExists(token.TokenID))
                     {
                         return NotFound();
                     }
@@ -116,10 +113,10 @@ namespace TokenNotifier.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(token);
         }
 
-        // GET: Users/Delete/5
+        // GET: Tokens/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -127,30 +124,30 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var token = await _context.Tokens
+                .FirstOrDefaultAsync(m => m.TokenID == id);
+            if (token == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(token);
         }
 
-        // POST: Users/Delete/5
+        // POST: Tokens/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            _context.Users.Remove(user);
+            var token = await _context.Tokens.FindAsync(id);
+            _context.Tokens.Remove(token);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool TokenExists(int id)
         {
-            return _context.Users.Any(e => e.UserID == id);
+            return _context.Tokens.Any(e => e.TokenID == id);
         }
     }
 }

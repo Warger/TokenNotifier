@@ -10,25 +10,22 @@ using TokenNotifier.Models;
 
 namespace TokenNotifier.Controllers
 {
-    public class UsersController : Controller
+    public class WalletsController : Controller
     {
         private readonly DbCryptoContext _context;
 
-        public UsersController(DbCryptoContext context)
+        public WalletsController(DbCryptoContext context)
         {
             _context = context;
         }
 
-        // GET: Users
+        // GET: Wallets
         public async Task<IActionResult> Index()
         {
-            //  DbInitializer.Initialize(_context);
-            Parser.Parser p = new Parser.Parser();
-            p.Update(_context);
-            return View(await _context.Users.ToListAsync());
+            return View(await _context.Wallets.ToListAsync());
         }
 
-        // GET: Users/Details/5
+        // GET: Wallets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,39 +33,39 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var wallet = await _context.Wallets
+                .FirstOrDefaultAsync(m => m.WalletID == id);
+            if (wallet == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(wallet);
         }
 
-        // GET: Users/Create
+        // GET: Wallets/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
+        // POST: Wallets/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Create([Bind("WalletID,Name,Address")] Wallet wallet)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                _context.Add(wallet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(wallet);
         }
 
-        // GET: Users/Edit/5
+        // GET: Wallets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,22 +73,22 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var wallet = await _context.Wallets.FindAsync(id);
+            if (wallet == null)
             {
                 return NotFound();
             }
-            return View(user);
+            return View(wallet);
         }
 
-        // POST: Users/Edit/5
+        // POST: Wallets/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserID,Login,Password")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("WalletID,Name,Address")] Wallet wallet)
         {
-            if (id != user.UserID)
+            if (id != wallet.WalletID)
             {
                 return NotFound();
             }
@@ -100,12 +97,12 @@ namespace TokenNotifier.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(wallet);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserID))
+                    if (!WalletExists(wallet.WalletID))
                     {
                         return NotFound();
                     }
@@ -116,10 +113,10 @@ namespace TokenNotifier.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(wallet);
         }
 
-        // GET: Users/Delete/5
+        // GET: Wallets/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -127,30 +124,30 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
+            var wallet = await _context.Wallets
+                .FirstOrDefaultAsync(m => m.WalletID == id);
+            if (wallet == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(wallet);
         }
 
-        // POST: Users/Delete/5
+        // POST: Wallets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            _context.Users.Remove(user);
+            var wallet = await _context.Wallets.FindAsync(id);
+            _context.Wallets.Remove(wallet);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool WalletExists(int id)
         {
-            return _context.Users.Any(e => e.UserID == id);
+            return _context.Wallets.Any(e => e.WalletID == id);
         }
     }
 }

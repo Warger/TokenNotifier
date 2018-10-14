@@ -16,5 +16,7 @@ namespace TokenNotifier.Models
         public string Description { get; set; }
         public Actions? Action { get; set; }
         public Wallet LinkedWallet { get; set; }
+        public DateTime DateTime { get; set; }
+        public double Value { get; set; } 
     }
 }

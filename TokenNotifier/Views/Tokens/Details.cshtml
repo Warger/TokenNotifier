@@ -1,0 +1,60 @@
+﻿@model TokenNotifier.Models.Token
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Token</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Decimals)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Decimals)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ShortName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ShortName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsObserved)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsObserved)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PercentForNotification)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PercentForNotification)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalSupply)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TotalSupply)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.TokenID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

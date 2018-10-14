@@ -1,0 +1,63 @@
+﻿@model TokenNotifier.Models.Transfer
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Transfer</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="IncomingAddress" class="control-label"></label>
+                <input asp-for="IncomingAddress" class="form-control" />
+                <span asp-validation-for="IncomingAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OutgoingAddress" class="control-label"></label>
+                <input asp-for="OutgoingAddress" class="form-control" />
+                <span asp-validation-for="OutgoingAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Value" class="control-label"></label>
+                <input asp-for="Value" class="form-control" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Token" class="control-label"></label>
+                <input asp-for="Token" class="form-control" />
+                <span asp-validation-for="Token" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UsdValue" class="control-label"></label>
+                <input asp-for="UsdValue" class="form-control" />
+                <span asp-validation-for="UsdValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransactionHash" class="control-label"></label>
+                <input asp-for="TransactionHash" class="form-control" />
+                <span asp-validation-for="TransactionHash" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,63 @@
+﻿@model TokenNotifier.Models.Token
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Token</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Decimals)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Decimals)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ShortName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ShortName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsObserved)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsObserved)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PercentForNotification)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PercentForNotification)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalSupply)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TotalSupply)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="TokenID" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

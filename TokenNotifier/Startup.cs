@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
+using Hangfire;
+using Hangfire.MySql.Core;
+
 
 namespace TokenNotifier
 {
@@ -36,6 +39,8 @@ namespace TokenNotifier
             services.AddDbContext<DbCryptoContext>
                (options => options.UseMySql(Configuration.GetConnectionString("TokenNotifierContext")));
 
+            services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("TokenNotifierContext"))));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -55,6 +60,12 @@ namespace TokenNotifier
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new MyAuthorizationFilter() }
+            });
+            app.UseHangfireServer();
 
             app.UseMvc(routes =>
             {
