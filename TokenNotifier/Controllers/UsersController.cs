@@ -22,9 +22,6 @@ namespace TokenNotifier.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            //  DbInitializer.Initialize(_context);
-            Parser.Parser p = new Parser.Parser();
-            p.Update(_context);
             return View(await _context.Users.ToListAsync());
         }
 

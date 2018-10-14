@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
 using Hangfire;
 using Hangfire.MySql.Core;
-
+using TokenNotifier.Parser;
 
 namespace TokenNotifier
 {
@@ -39,12 +39,14 @@ namespace TokenNotifier
             services.AddDbContext<DbCryptoContext>
                (options => options.UseMySql(Configuration.GetConnectionString("TokenNotifierContext")));
 
+            services.AddSingleton<Updater>();
+
             services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("TokenNotifierContext"))));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.C:\Users\warge\Source\Repos\Warger\TokenNotifier\TokenNotifier\Startup.cs
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -66,7 +68,7 @@ namespace TokenNotifier
                 Authorization = new[] { new MyAuthorizationFilter() }
             });
             app.UseHangfireServer();
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

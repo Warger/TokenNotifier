@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
-using X.PagedList;
 
 namespace TokenNotifier.Controllers
 {
@@ -21,11 +20,9 @@ namespace TokenNotifier.Controllers
         }
 
         // GET: Transfers
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index()
         {
-            int pageSize = 50;
-            int pageNumber = (page ?? 1);
-            return View(_context.Transfers.ToPagedList(pageNumber, pageSize));
+            return View(await _context.Transfers.ToListAsync());
         }
 
         // GET: Transfers/Details/5
@@ -57,7 +54,7 @@ namespace TokenNotifier.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue,TransactionHash")] Transfer transfer)
+        public async Task<IActionResult> Create([Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue")] Transfer transfer)
         {
             if (ModelState.IsValid)
             {
@@ -89,7 +86,7 @@ namespace TokenNotifier.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue,TransactionHash")] Transfer transfer)
+        public async Task<IActionResult> Edit(int id, [Bind("TrasferID,IncomingAddress,OutgoingAddress,Date,Value,Token,UsdValue")] Transfer transfer)
         {
             if (id != transfer.TrasferID)
             {
