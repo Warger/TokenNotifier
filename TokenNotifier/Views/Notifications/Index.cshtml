@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TokenNotifier.Models.Notification>
+﻿@model IEnumerable<TokenNotifier.ViewModels.NotificationForView>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,16 +13,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Action)
+                Action
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DateTime)
+                DateTime
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Value)
+               Value
+            </th>
+            <th>
+                Wallet Name
             </th>
             <th></th>
         </tr>
@@ -31,21 +34,26 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.Notification.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Action)
+                @Html.DisplayFor(modelItem => item.Notification.Action)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DateTime)
+                @Html.DisplayFor(modelItem => item.Notification.DateTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Value)
+                @Html.DisplayFor(modelItem => item.Notification.Value)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.NotificationID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NotificationID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NotificationID">Delete</a>
+                <a href="https://etherscan.io/address/@item.WalletAddress">
+                    @Html.DisplayFor(modelItem => item.WalletName)
+                </a>
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Notification.NotificationID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Notification.NotificationID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Notification.NotificationID">Delete</a>
             </td>
         </tr>
 }

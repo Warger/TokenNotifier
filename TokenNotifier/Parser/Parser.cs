@@ -19,15 +19,15 @@ namespace TokenNotifier.Parser
                 if (!t.IsObserved)
                     continue;
 
-                Transfer lastTransfer = db.Transfers.FirstOrDefault(ft => ft.Token == t.Contract);
-                DateTime startTime = lastTransfer == null ? DateTime.Now.AddHours(-24) : lastTransfer.Date.AddMinutes(-20);
+                Transfer lastTransfer = db.Transfers.Where(ft => ft.Token == t.Contract).OrderBy(ft => ft.Date).LastOrDefault();
+                DateTime startTime = lastTransfer == null ? ConvertTime(DateTime.Now.AddHours(-24)) : lastTransfer.Date.AddMinutes(-20);
 
-                List<Transfer> transfers = await GetTransactionsForToken(t.Contract, t.Decimals, startTime, DateTime.Now);
+                List<Transfer> transfers = await GetTransactionsForToken(t.Contract, t.Decimals, startTime, ConvertTime(DateTime.Now));
                 AddTransactions(db, t, transfers);
 
                 UpdateTotalSupply(t.Contract);
             }
-            AddNotifications(db, DateTime.Now.AddHours(-24), DateTime.Now);
+            AddNotifications(db, ConvertTime(DateTime.Now.AddHours(-24)), ConvertTime(DateTime.Now));
 
         }
 
@@ -47,7 +47,7 @@ namespace TokenNotifier.Parser
 
                 if (GetTokenNotificationValue(t) <= gt.Value)
                 {
-                    if (db.Notifications.Where(n => gt.Wallet == n.LinkedWallet.Address && n.DateTime.AddHours(24) > DateTime.Now && gt.Value <= n.Value*2).Count() != 0)
+                    if (db.Notifications.Where(n => gt.Wallet == n.LinkedWallet.Address && n.DateTime.AddHours(24) > ConvertTime(DateTime.Now) && gt.Value <= n.Value*2).Count() != 0)
                         continue;
 
                     Wallet w = db.Wallets.SingleOrDefault(wal => wal.Address == gt.Wallet);
@@ -58,7 +58,7 @@ namespace TokenNotifier.Parser
                     }
 
                     db.Notifications.Add(new Notification() { Action = Actions.BigDailySum, LinkedWallet = w, Description = "[" + t.Name + "]. Transfer summ per day: " + gt.Value + 
-                        " on the wallet: " + gt.Wallet, DateTime = DateTime.Now, Value = gt.Value});
+                        " on the wallet: " + gt.Wallet, DateTime = ConvertTime(DateTime.Now), Value = gt.Value});
                     db.SaveChanges();
                 }
             }
@@ -79,6 +79,7 @@ namespace TokenNotifier.Parser
             int page = 1;
             int trasactionsPerPage = 100;
             List<Transfer> result = new List<Transfer>();
+            System.Threading.Thread.Sleep(1000);
 
             try
             {
@@ -117,7 +118,7 @@ namespace TokenNotifier.Parser
                                 IncomingAddress = transfer.to,
                                 OutgoingAddress = transfer.from,
                                 Token = tokenContract,
-                                UsdValue = ((double)transfer.usdPrice * val),
+                                UsdValue = transfer.usdPrice != null ?((double)transfer.usdPrice * val) : 0,
                                 Value = val,
                                 TransactionHash = transfer.transactionHash
                             });
@@ -141,12 +142,21 @@ namespace TokenNotifier.Parser
                 "%26pageSize%3D100&showTx=all";
         }
 
-        private static DateTime UnixTimeStampToDateTime(string unixTimeStamp)
+        private DateTime UnixTimeStampToDateTime(string unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(long.Parse(unixTimeStamp)).ToLocalTime();
-            return dtDateTime;
+
+            return ConvertTime(dtDateTime);
+        }
+
+        private DateTime ConvertTime(DateTime utc)
+        {
+            TimeZoneInfo timeInfo = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+            DateTime utcKind = DateTime.SpecifyKind(utc, DateTimeKind.Utc);
+
+            return TimeZoneInfo.ConvertTimeFromUtc(utcKind, timeInfo);
         }
 
         private void UpdateTotalSupply(string contract)

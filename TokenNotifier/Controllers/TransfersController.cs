@@ -2,21 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
+using TokenNotifier.Parser;
 
 namespace TokenNotifier.Controllers
 {
     public class TransfersController : Controller
     {
         private readonly DbCryptoContext _context;
+        private Updater u;
+        private readonly ILogger _logger;
 
-        public TransfersController(DbCryptoContext context)
+        public TransfersController(DbCryptoContext context, Updater u)
         {
             _context = context;
+            this.u = u;
+       //     _logger = logger.CreateLogger("TransferController");
         }
 
         // GET: Transfers
@@ -79,6 +86,15 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
             return View(transfer);
+        }
+
+        // GET: Transfers/Update
+        public async Task Update()
+        {
+            //            _logger.LogError("Update was call");
+            ILog log = LogManager.GetLogger(typeof(Program));
+            log.Info("Update was call");
+            await u.Update(_context);
         }
 
         // POST: Transfers/Edit/5

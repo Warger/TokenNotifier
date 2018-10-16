@@ -14,6 +14,7 @@ using TokenNotifier.Data;
 using Hangfire;
 using Hangfire.MySql.Core;
 using TokenNotifier.Parser;
+using Microsoft.Extensions.Logging;
 
 namespace TokenNotifier
 {
@@ -47,8 +48,21 @@ namespace TokenNotifier
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.C:\Users\warge\Source\Repos\Warger\TokenNotifier\TokenNotifier\Startup.cs
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Create a logging provider based on the configuration information passed through the appsettings.json
+            // You can even provide your custom formatting.
+            loggerFactory.AddAWSProvider(this.Configuration.GetAWSLoggingConfigSection(),
+                formatter: (logLevel, message, exception) => $"[{DateTime.UtcNow}] {logLevel}: {message}");
+
+            // Create a logger instance from the loggerFactory
+            var logger = loggerFactory.CreateLogger<Program>();
+
+            // Example Logging
+            logger.LogInformation("Check the AWS Console CloudWatch Logs console in us-east-1");
+            logger.LogInformation("to see messages in the log streams for the");
+            logger.LogInformation("log group AspNetCore.WebSample");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,6 +72,8 @@ namespace TokenNotifier
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+          //  LoggerFactory.AddLog4Net();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

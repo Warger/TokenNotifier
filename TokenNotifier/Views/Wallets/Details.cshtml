@@ -20,7 +20,15 @@
             @Html.DisplayNameFor(model => model.Address)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Address)
+            <a href="https://etherscan.io/address/@Html.DisplayFor(model => model.Address)">
+                @Html.DisplayFor(model => model.Address)
+            </a>
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
         </dd>
     </dl>
 </div>

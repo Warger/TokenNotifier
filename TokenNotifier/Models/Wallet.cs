@@ -10,5 +10,14 @@ namespace TokenNotifier.Models
         public int WalletID { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
+        public string Comment { get; set; }
+
+        public string NameOrAddress
+        {
+            get
+            {
+                return Name == null ? Address : Name;
+            }
+        }
     }
 }

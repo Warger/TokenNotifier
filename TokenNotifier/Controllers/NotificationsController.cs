@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
+using TokenNotifier.ViewModels;
 
 namespace TokenNotifier.Controllers
 {
@@ -22,7 +23,12 @@ namespace TokenNotifier.Controllers
         // GET: Notifications
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Notifications.ToListAsync());
+            List<NotificationForView> nfvl = new List<NotificationForView>();
+            List<Notification> notifications = await _context.Notifications.OrderByDescending(x=>x.DateTime).Include(x => x.LinkedWallet).ToListAsync();
+            foreach (Notification n in notifications)
+                nfvl.Add(new NotificationForView(n, n.LinkedWallet.Address, n.LinkedWallet.NameOrAddress));
+
+            return View(nfvl);
         }
 
         // GET: Notifications/Details/5

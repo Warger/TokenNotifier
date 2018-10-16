@@ -11,6 +11,7 @@ using TokenNotifier.Data;
 using Microsoft.Extensions.DependencyInjection;
 using TokenNotifier.Models;
 
+
 namespace TokenNotifier
 {
     public class Program
@@ -25,6 +26,5 @@ namespace TokenNotifier
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
-
     }
 }

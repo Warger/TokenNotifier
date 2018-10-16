@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TokenNotifier.Data;
 
@@ -18,21 +19,28 @@ namespace TokenNotifier.Parser
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public async Task Execute()
+        public void Execute()
         {
             if (isProcessing)
                 return;
 
-            using (var scope = _serviceScopeFactory.CreateScope())
+            try
             {
-                await Update(scope.ServiceProvider);
+                using (WebClient wc = new WebClient())
+                {
+                //var json = wc.DownloadString("https://localhost:44377/Transfers/Update");
+                  var json = wc.DownloadString("https://ec2-18-216-22-23.us-east-2.compute.amazonaws.com/Transfers/Update");
+                }
+            }
+            catch (Exception e)
+            {
+                return;
             }
         }
 
-        public async Task Update(IServiceProvider serviceProvider)
+        public async Task Update(DbCryptoContext _context)
         {
             isProcessing = true;
-            var _context = serviceProvider.GetRequiredService<DbCryptoContext>();
 
             Parser p = new Parser();
             p.Update(_context);

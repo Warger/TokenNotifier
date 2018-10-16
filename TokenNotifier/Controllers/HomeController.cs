@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TokenNotifier.Models;
 using TokenNotifier.Parser;
 
@@ -12,15 +13,19 @@ namespace TokenNotifier.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(Updater u)
+        ILogger<HomeController> Logger { get; set; }
+
+        public HomeController(ILogger<HomeController> logger, Updater u)
         {
-         //   Updater u = .GetRequiredService<DbCryptoContext>();
+            //   Updater u = .GetRequiredService<DbCryptoContext>();
+            this.Logger = logger;
 
             RecurringJob.AddOrUpdate(() => u.Execute(), Cron.MinuteInterval(10));
         }
 
         public IActionResult Index()
         {
+            Logger.LogInformation("Home open");
             return View();
         }
 
