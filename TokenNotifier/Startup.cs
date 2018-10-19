@@ -58,11 +58,6 @@ namespace TokenNotifier
             // Create a logger instance from the loggerFactory
             var logger = loggerFactory.CreateLogger<Program>();
 
-            // Example Logging
-            logger.LogInformation("Check the AWS Console CloudWatch Logs console in us-east-1");
-            logger.LogInformation("to see messages in the log streams for the");
-            logger.LogInformation("log group AspNetCore.WebSample");
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TokenNotifier.Data;
@@ -12,8 +13,13 @@ namespace TokenNotifier.Parser
 {
     public class Parser
     {
-        public async void Update(DbCryptoContext db)
+        private ILogger logger;
+
+        public async void Update(DbCryptoContext db, ILogger _logger)
         {
+            logger = _logger;
+            logger.LogDebug("Parser.Update starting...");
+
             foreach (Token t in db.Tokens)
             {
                 if (!t.IsObserved)
@@ -23,12 +29,13 @@ namespace TokenNotifier.Parser
                 DateTime startTime = lastTransfer == null ? ConvertTime(DateTime.Now.AddHours(-24)) : lastTransfer.Date.AddMinutes(-20);
 
                 List<Transfer> transfers = await GetTransactionsForToken(t.Contract, t.Decimals, startTime, ConvertTime(DateTime.Now));
+
                 AddTransactions(db, t, transfers);
 
                 UpdateTotalSupply(t.Contract);
             }
             AddNotifications(db, ConvertTime(DateTime.Now.AddHours(-24)), ConvertTime(DateTime.Now));
-
+            logger.LogDebug("Parser.Update finished");
         }
 
         private void AddNotifications(DbCryptoContext db, DateTime startTime, DateTime endTime)
@@ -66,12 +73,17 @@ namespace TokenNotifier.Parser
 
         private void AddTransactions(DbCryptoContext db, Token t, List<Transfer> transfers)
         {
+            int i=0;
             foreach (Transfer tr in transfers)
             {
                 if (db.Transfers.Where(trans => trans.Token == t.Contract && tr.TransactionHash == trans.TransactionHash).Count() == 0)
+                {
                     db.Transfers.Add(tr);
+                    i++;
+                }
             }
             db.SaveChanges();
+            logger.LogDebug("Token: " + t.Name + ". Added " + i + " transfers");
         }
 
         private async Task<List<Transfer>> GetTransactionsForToken(string tokenContract, double dec, DateTime startTime, DateTime endTime)
@@ -79,7 +91,7 @@ namespace TokenNotifier.Parser
             int page = 1;
             int trasactionsPerPage = 100;
             List<Transfer> result = new List<Transfer>();
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(10000);
 
             try
             {
@@ -132,6 +144,8 @@ namespace TokenNotifier.Parser
             }
             catch (Exception e)
             {
+                logger.LogDebug("Exception on Update method: " + e.Message);
+
                 return result;
             }
         }

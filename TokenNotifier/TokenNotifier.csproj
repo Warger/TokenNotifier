@@ -31,4 +31,10 @@
     <PackageReference Include="X.PagedList.Mvc" Version="7.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Wallets\Update.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

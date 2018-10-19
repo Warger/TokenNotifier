@@ -23,7 +23,8 @@ namespace TokenNotifier.Controllers
         {
             _context = context;
             this.u = u;
-       //     _logger = logger.CreateLogger("TransferController");
+            //     _logger = logger.CreateLogger("TransferController");
+
         }
 
         // GET: Transfers
@@ -88,14 +89,16 @@ namespace TokenNotifier.Controllers
             return View(transfer);
         }
 
-        // GET: Transfers/Update
-        public async Task Update()
+    /*    // GET: Transfers/Update
+        public async Task<IActionResult> Update()
         {
             //            _logger.LogError("Update was call");
             ILog log = LogManager.GetLogger(typeof(Program));
             log.Info("Update was call");
             await u.Update(_context);
+            return View(await _context.Transfers.ToListAsync());
         }
+        */
 
         // POST: Transfers/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
