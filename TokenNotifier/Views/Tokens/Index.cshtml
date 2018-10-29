@@ -5,6 +5,9 @@
 }
 
 <h2>Index</h2>
+<p>
+    <input type="button" value="Fast Create (by contract)" onclick="location.href='@Url.Action("FastCreate", "Tokens")'" />
+</p>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -37,35 +40,36 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Decimals)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShortName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Contract)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsObserved)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PercentForNotification)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalSupply)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.TokenID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TokenID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TokenID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Decimals)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShortName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contract)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsObserved)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PercentForNotification)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalSupply)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.TokenID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.TokenID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.TokenID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

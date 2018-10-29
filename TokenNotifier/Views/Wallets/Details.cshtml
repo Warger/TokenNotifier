@@ -1,4 +1,4 @@
-﻿@model TokenNotifier.Models.Wallet
+﻿@model TokenNotifier.ViewModels.WalletForView
 
 @{
     ViewData["Title"] = "Details";
@@ -11,28 +11,94 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Wallet.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Wallet.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Address)
+            @Html.DisplayNameFor(model => model.Wallet.Address)
         </dt>
         <dd>
-            <a href="https://etherscan.io/address/@Html.DisplayFor(model => model.Address)">
-                @Html.DisplayFor(model => model.Address)
+            <a href="https://etherscan.io/address/@Html.DisplayFor(model => model.Wallet.Address)">
+                @Html.DisplayFor(model => model.Wallet.Address)
             </a>
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Comment)
+            @Html.DisplayNameFor(model => model.Wallet.Comment)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Comment)
+            @Html.DisplayFor(model => model.Wallet.Comment)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.WalletID">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Wallet.WalletID">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+@if (Model.TransferList.Count != 0)
+{
+    <h3>Transfers for wallet</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Token
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    UsdValue
+                </th>
+                <th>
+                    Supply Percentage
+                </th>
+                <th>
+                    IncomingAddress
+                </th>
+                <th>
+                    OutgoingAddress
+                </th>
+                <th>
+                    Date
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.TransferList)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TokenName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Transfer.Value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Transfer.UsdValue)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SupplyPercentage)
+                    </td>
+                    <td>
+                        <a href="https://etherscan.io/address/@item.Transfer.IncomingAddress">
+                            @Html.DisplayFor(modelItem => item.Transfer.IncomingAddress)
+                        </a>
+                    </td>
+                    <td>
+                        <a href="https://etherscan.io/address/@item.Transfer.OutgoingAddress">
+                            @Html.DisplayFor(modelItem => item.Transfer.OutgoingAddress)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Transfer.Date)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

@@ -1,10 +1,19 @@
-﻿@model IEnumerable<TokenNotifier.Models.Transfer>
+﻿@model ReflectionIT.Mvc.Paging.PagingList<TokenNotifier.ViewModels.TransferForView>
+
+@using ReflectionIT.Mvc.Paging
+
+@addTagHelper *, ReflectionIT.Mvc.Paging
+
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transfers";
 }
 
-<h2>Index</h2>
+<h2>Transfers</h2>
+
+<nav aria-label="Transfers navigation">
+    @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
+</nav>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,59 +22,68 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.IncomingAddress)
+                Token
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OutgoingAddress)
+                @Html.DisplayNameFor(model => model.Transfer.Value)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                @Html.DisplayNameFor(model => model.Transfer.UsdValue)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Value)
+                Supply Percentage
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Token)
+                @Html.DisplayNameFor(model => model.Transfer.IncomingAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UsdValue)
+                @Html.DisplayNameFor(model => model.Transfer.OutgoingAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TransactionHash)
+                @Html.DisplayNameFor(model => model.Transfer.Date)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.IncomingAddress)
+                @Html.DisplayFor(modelItem => item.TokenName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OutgoingAddress)
+                @Html.DisplayFor(modelItem => item.Transfer.Value)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Date)
+                @Html.DisplayFor(modelItem => item.Transfer.UsdValue)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Value)
+                @Html.DisplayFor(modelItem => item.SupplyPercentage)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Token)
+                <a href="https://etherscan.io/address/@item.Transfer.IncomingAddress">
+                    @Html.DisplayFor(modelItem => item.Transfer.IncomingAddress)
+                </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UsdValue)
+                <a href="https://etherscan.io/address/@item.Transfer.OutgoingAddress">
+                    @Html.DisplayFor(modelItem => item.Transfer.OutgoingAddress)
+                </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TransactionHash)
+                @Html.DisplayFor(modelItem => item.Transfer.Date)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.TrasferID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TrasferID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TrasferID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Transfer.TrasferID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Transfer.TrasferID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Transfer.TrasferID">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>
+
+<nav aria-label="Transfers navigation">
+    <vc:pager paging-list="@Model" />
+</nav>

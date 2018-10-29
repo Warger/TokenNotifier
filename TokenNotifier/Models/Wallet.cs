@@ -16,7 +16,15 @@ namespace TokenNotifier.Models
         {
             get
             {
-                return Name == null ? Address : Name;
+                return Name == null || Name.Length==0 ? Address : Name;
+            }
+        }
+
+        public string GetUrl
+        {
+            get
+            {
+                return "https://etherscan.io/address/" + Address ;
             }
         }
     }

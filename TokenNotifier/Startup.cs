@@ -15,6 +15,7 @@ using Hangfire;
 using Hangfire.MySql.Core;
 using TokenNotifier.Parser;
 using Microsoft.Extensions.Logging;
+using ReflectionIT.Mvc.Paging;
 
 namespace TokenNotifier
 {
@@ -45,6 +46,7 @@ namespace TokenNotifier
             services.AddHangfire(x => x.UseStorage(new MySqlStorage(Configuration.GetConnectionString("TokenNotifierContext"))));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddPaging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.C:\Users\warge\Source\Repos\Warger\TokenNotifier\TokenNotifier\Startup.cs

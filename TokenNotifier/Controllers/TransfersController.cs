@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ReflectionIT.Mvc.Paging;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
 using TokenNotifier.Parser;
+using TokenNotifier.ViewModels;
 
 namespace TokenNotifier.Controllers
 {
@@ -28,9 +30,36 @@ namespace TokenNotifier.Controllers
         }
 
         // GET: Transfers
-        public async Task<IActionResult> Index()
+     /*   public async Task<IActionResult> Index()
         {
-            return View(await _context.Transfers.ToListAsync());
+            return View(await _context.Transfers.OrderByDescending(x => x.Date).ToListAsync());
+        }
+        */
+
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            var model = PagingList.Create(_context.Transfers.OrderByDescending(x => x.Date), 50, page);
+
+            List<TransferForView> nfvl = new List<TransferForView>();
+            foreach (Transfer t in model)
+            {
+                Wallet inW, outW;
+                inW = _context.Wallets.FirstOrDefault(w => w.Address == t.IncomingAddress);
+                outW = _context.Wallets.FirstOrDefault(w => w.Address == t.OutgoingAddress);
+
+                Token tok = _context.Tokens.FirstOrDefault(token => token.Contract == t.Token);
+
+                double supPercent = tok == null ? 0 : (t.Value / tok.TotalSupply);
+
+                nfvl.Add(new TransferForView(t, inW == null ? new Wallet() { Name="", Address=t.IncomingAddress } : inW, 
+                    outW == null ? new Wallet() { Name = "", Address = t.OutgoingAddress } : outW, tok == null ? t.Token : tok.ShortName,
+                    supPercent.ToString("0.000000") + " %" ));
+            }
+            nfvl.AddRange(Enumerable.Repeat(new TransferForView(), (_context.Transfers.Count()-50*page)).ToList());
+            List<TransferForView> newList = Enumerable.Repeat(new TransferForView(), (50 * (page - 1))).ToList();
+            newList.AddRange(nfvl);
+
+            return View(PagingList.Create(newList, 50, page));
         }
 
         // GET: Transfers/Details/5

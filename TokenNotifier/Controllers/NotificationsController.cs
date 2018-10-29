@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ReflectionIT.Mvc.Paging;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
 using TokenNotifier.ViewModels;
@@ -21,6 +22,7 @@ namespace TokenNotifier.Controllers
         }
 
         // GET: Notifications
+        /*  
         public async Task<IActionResult> Index()
         {
             List<NotificationForView> nfvl = new List<NotificationForView>();
@@ -29,6 +31,19 @@ namespace TokenNotifier.Controllers
                 nfvl.Add(new NotificationForView(n, n.LinkedWallet.Address, n.LinkedWallet.NameOrAddress));
 
             return View(nfvl);
+        }
+        */
+
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            List <NotificationForView> nfvl = new List<NotificationForView>();
+            List<Notification> notifications = await _context.Notifications.OrderByDescending(x => x.DateTime).Include(x => x.LinkedWallet).ToListAsync();
+            foreach (Notification n in notifications)
+                nfvl.Add(new NotificationForView(n, n.LinkedWallet.Address, n.LinkedWallet.NameOrAddress));
+
+            var res = nfvl.AsEnumerable();
+            var model = PagingList.Create(res, 50, page);
+            return View(model);
         }
 
         // GET: Notifications/Details/5

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ReflectionIT.Mvc.Paging;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
+using TokenNotifier.ViewModels;
 
 namespace TokenNotifier.Controllers
 {
@@ -19,10 +21,11 @@ namespace TokenNotifier.Controllers
             _context = context;
         }
 
-        // GET: Wallets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Wallets.ToListAsync());
+            var qry = _context.Wallets.AsNoTracking().OrderBy(x=> x.WalletID);
+            var model = await PagingList.CreateAsync(qry, 50, page);
+            return View(model);
         }
 
         // GET: Wallets/Details/5
@@ -40,7 +43,30 @@ namespace TokenNotifier.Controllers
                 return NotFound();
             }
 
-            return View(wallet);
+            List<Transfer> transfers = new List<Transfer>();
+            List<Transfer> dbTransfers = _context.Transfers.Where(t => t.IncomingAddress == wallet.Address || t.OutgoingAddress == wallet.Address).OrderBy(t => t.Date).ToList();
+            transfers.AddRange(dbTransfers);
+
+            List<TransferForView> tfw = new List<TransferForView>();
+
+            foreach (Transfer t in transfers)
+            {
+                Wallet inW, outW;
+                inW = _context.Wallets.FirstOrDefault(w => w.Address == t.IncomingAddress);
+                outW = _context.Wallets.FirstOrDefault(w => w.Address == t.OutgoingAddress);
+
+                Token tok = _context.Tokens.FirstOrDefault(token => token.Contract == t.Token);
+
+                double supPercent = tok == null ? 0 : (t.Value / tok.TotalSupply);
+
+                tfw.Add(new TransferForView(t, inW == null ? new Wallet() { Name = "", Address = t.IncomingAddress } : inW,
+                    outW == null ? new Wallet() { Name = "", Address = t.OutgoingAddress } : outW, tok == null ? t.Token : tok.ShortName,
+                    supPercent.ToString("0.000000") + " %"));
+            }
+
+            WalletForView wfv = new WalletForView(wallet, tfw);
+
+            return View(wfv);
         }
 
         // GET: Wallets/Create

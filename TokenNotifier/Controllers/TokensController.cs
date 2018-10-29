@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
+using TokenNotifier.Parser;
 
 namespace TokenNotifier.Controllers
 {
@@ -58,6 +59,25 @@ namespace TokenNotifier.Controllers
         {
             if (ModelState.IsValid)
             {
+                _context.Add(token);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(token);
+        }
+
+        public IActionResult FastCreate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FastCreate([Bind("Contract")] Token token)
+        {
+            if (ModelState.IsValid)
+            {
+                token = TokenParser.GetTokenByContract(token.Contract);
                 _context.Add(token);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

@@ -23,6 +23,8 @@ namespace TokenNotifier.Parser
 
         public async Task Execute()
         {
+            logger.LogDebug("Caling await Execute(). ISProcessing:" + (isProcessing ? "true" : "false"));
+
             if (isProcessing)
                 return;
 

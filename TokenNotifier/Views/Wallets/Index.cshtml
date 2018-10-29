@@ -1,4 +1,8 @@
-﻿@model IEnumerable<TokenNotifier.Models.Wallet>
+﻿@model ReflectionIT.Mvc.Paging.PagingList<TokenNotifier.Models.Wallet>
+
+@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
+
 
 @{
     ViewData["Title"] = "Index";
@@ -9,6 +13,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+
+<nav aria-label="Wallets navigation">
+    @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
+</nav>
+
+
 <table class="table">
     <thead>
         <tr>
@@ -25,25 +36,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a href="https://etherscan.io/address/@item.Address">
-                    @Html.DisplayFor(modelItem => item.Address)
-                </a>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Comment)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.WalletID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.WalletID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.WalletID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a href="@item.GetUrl">
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.WalletID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.WalletID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.WalletID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<nav aria-label="Wallets navigation">
+    <vc:pager paging-list="@Model" />
+</nav>
+
