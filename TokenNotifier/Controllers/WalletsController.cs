@@ -61,7 +61,7 @@ namespace TokenNotifier.Controllers
 
                 tfw.Add(new TransferForView(t, inW == null ? new Wallet() { Name = "", Address = t.IncomingAddress } : inW,
                     outW == null ? new Wallet() { Name = "", Address = t.OutgoingAddress } : outW, tok == null ? t.Token : tok.ShortName,
-                    supPercent.ToString("0.000000") + " %"));
+                    supPercent.ToString("N4") + " %"));
             }
 
             WalletForView wfv = new WalletForView(wallet, tfw);

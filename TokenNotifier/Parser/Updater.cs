@@ -44,7 +44,7 @@ namespace TokenNotifier.Parser
             }
             catch (Exception e)
             {
-                logger.LogDebug("Exception on Update method: "+e.Message);
+                logger.LogDebug("Exception on Update method: "+e.Message + " Stacktrace: " + e.StackTrace);
                 isProcessing = false;
                 return;
             }

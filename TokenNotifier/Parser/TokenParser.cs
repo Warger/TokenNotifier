@@ -62,7 +62,7 @@ namespace TokenNotifier.Parser
             return res;
         }
 
-        public static decimal GetPriceByContract(string contract)
+        public static double GetPriceByContract(string contract)
         {
             string resResponse;
             using (WebClient wc = new WebClient())
@@ -72,9 +72,10 @@ namespace TokenNotifier.Parser
 
             // Get long name
             string price = GetStringByTag(resResponse, "Price:</span></td>\n<td>\n$");
+            //   price = price.Split(' ')[0].Replace('.', ',');
             price = price.Split(' ')[0];
 
-            return decimal.Parse(price);
+            return double.Parse(price);
         }
 
 

@@ -53,7 +53,7 @@ namespace TokenNotifier.Controllers
 
                 nfvl.Add(new TransferForView(t, inW == null ? new Wallet() { Name="", Address=t.IncomingAddress } : inW, 
                     outW == null ? new Wallet() { Name = "", Address = t.OutgoingAddress } : outW, tok == null ? t.Token : tok.ShortName,
-                    supPercent.ToString("0.000000") + " %" ));
+                    supPercent.ToString("N4") + " %" ));
             }
             nfvl.AddRange(Enumerable.Repeat(new TransferForView(), (_context.Transfers.Count()-50*page)).ToList());
             List<TransferForView> newList = Enumerable.Repeat(new TransferForView(), (50 * (page - 1))).ToList();

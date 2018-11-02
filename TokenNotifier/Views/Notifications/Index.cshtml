@@ -23,9 +23,6 @@
                 Description
             </th>
             <th>
-                Action
-            </th>
-            <th>
                 DateTime
             </th>
             <th>
@@ -48,13 +45,10 @@
                 @Html.DisplayFor(modelItem => item.Notification.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Notification.Action)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Notification.DateTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Notification.Value)
+                @String.Format("{0:#,##0}", item.Notification.Value)
             </td>
             <td>
                 <a href="https://etherscan.io/address/@item.WalletAddress">
@@ -62,7 +56,8 @@
                 </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Notification.PercentOfSupply)
+                @String.Format("{0:N4}", item.Notification.PercentOfSupply)
+
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Notification.NotificationID">Edit</a> |
