@@ -9,6 +9,14 @@
 
 <h2>Notifications</h2>
 
+@using (Html.BeginForm("Index", "Notifications", FormMethod.Get))
+{
+    @Html.DropDownList("Filter", new SelectList(ViewBag.Filter))
+    <button type="submit" class="btn btn-info" value="Filter">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>Filter
+    </button>
+}
+
 <nav aria-label="Notifications navigation">
     @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
 </nav>
@@ -23,10 +31,13 @@
                 Description
             </th>
             <th>
-                DateTime
+                @Html.ActionLink("DateTime", "Index", new { sortOrder = ViewBag.DateSortParm, filter = ViewBag.ChosenFilter, page = ViewBag.ChosenPage })
             </th>
             <th>
-                Value
+                @Html.ActionLink("USDValue", "Index", new { sortOrder = ViewBag.PriceSortParm, filter = ViewBag.ChosenFilter, page = ViewBag.ChosenPage })
+            </th>
+            <th>
+                Token Value
             </th>
             <th>
                 Wallet Name
@@ -40,31 +51,34 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notification.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notification.DateTime)
-            </td>
-            <td>
-                @String.Format("{0:#,##0}", item.Notification.Value)
-            </td>
-            <td>
-                <a href="https://etherscan.io/address/@item.WalletAddress">
-                    @Html.DisplayFor(modelItem => item.WalletName)
-                </a>
-            </td>
-            <td>
-                @String.Format("{0:N4}", item.Notification.PercentOfSupply)
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notification.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notification.DateTime)
+                </td>
+                <td>
+                    @String.Format("{0:#,##0}", item.Notification.USDValue)
+                </td>
+                <td>
+                    @String.Format("{0:#,##0}", item.Notification.Value)
+                </td>
+                <td>
+                    <a href="https://etherscan.io/address/@item.WalletAddress">
+                        @Html.DisplayFor(modelItem => item.WalletName)
+                    </a>
+                </td>
+                <td>
+                    @String.Format("{0:N4}", item.Notification.PercentOfSupply)
 
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Notification.NotificationID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Notification.NotificationID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Notification.NotificationID">Delete</a>
-            </td>
-        </tr>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Notification.NotificationID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Notification.NotificationID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Notification.NotificationID">Delete</a>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

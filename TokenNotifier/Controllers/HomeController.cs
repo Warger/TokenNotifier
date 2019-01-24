@@ -21,6 +21,7 @@ namespace TokenNotifier.Controllers
             //   Updater u = .GetRequiredService<DbCryptoContext>();
             this.Logger = logger;
             RecurringJob.AddOrUpdate(() => u.Execute(), Cron.MinuteInterval(10));
+            u.Execute();
         }
 
         public IActionResult Index()

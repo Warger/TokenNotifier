@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -82,15 +86,20 @@ namespace TokenNotifier.Parser
                         db.SaveChanges();
                     }
 
+                    // Send SMS for big transaction
+                    if ((gt.Value / t.TotalSupply) > 0.01)
+                        SendSMS("Trascation for token " + t.Name + " - "+ String.Format("{0:#,##0}", gt.UsdValue) + "$");
+
                     db.Notifications.Add(new Notification()
                     {
                         Action = Actions.BigDailySum,
                         LinkedWallet = w,
-                        Description = "[" + t.Name + "]. Transfer summ per day: " + gt.Value + " (" + String.Format("{0:#,##0}", gt.UsdValue) + "$)" +
-                        " on the wallet: " + gt.Wallet,
+                        Description = "[" + t.Name + "]. Transfer summ per day: " + String.Format("{0:#,##0}", gt.Value) + 
+                        " (" + String.Format("{0:#,##0}", gt.UsdValue) + "$)" + " on the wallet: " + gt.Wallet,
                         DateTime = ConvertTime(DateTime.Now),
                         Value = gt.Value,
-                        PercentOfSupply = gt.Value / t.TotalSupply * 100
+                        PercentOfSupply = gt.Value / t.TotalSupply * 100,
+                        USDValue = gt.UsdValue
                     });
                     db.SaveChanges();
                 }
@@ -239,6 +248,31 @@ namespace TokenNotifier.Parser
             }
 
             return res;
+        }
+
+        private void SendSMS(string message, string phoneNumber = "79250813700")
+        {
+            try
+            {
+                using (WebClient wc = new WebClient())
+                {
+                    NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                    queryString["api_id"] = "540DEBD9-3F8B-CE62-60F3-B9726D0B0ACA";
+                    queryString["to"] = phoneNumber;
+                    queryString["msg"] = message;
+                    queryString["json"] = "1";
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://sms.ru/sms/send?"
+                        + queryString.ToString());
+
+                    WebResponse response = request.GetResponse();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogDebug("Exception on SendSMS method: " + e.Message + " Stacktrace: " + e.StackTrace);
+            }
         }
 
         private double GetTokenNotificationValue(Token t)

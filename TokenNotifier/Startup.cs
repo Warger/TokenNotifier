@@ -70,8 +70,6 @@ namespace TokenNotifier
                 app.UseHsts();
             }
 
-          //  LoggerFactory.AddLog4Net();
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();

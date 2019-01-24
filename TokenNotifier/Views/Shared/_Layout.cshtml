@@ -263,22 +263,22 @@
                         <!-- /input-group -->
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-wrench fa-fw"></i> Entities<span class="fa arrow"></span></a>
+                        <a><i class="fa fa-wrench fa-fw"></i> Entities<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="Users">Users</a>
+                                @Html.ActionLink("Users", "Index", "Users")
                             </li>
                             <li>
-                                <a href="Tokens">Tokens</a>
+                                @Html.ActionLink("Tokens", "Index", "Tokens")
                             </li>
                             <li>
-                                <a href="Transfers">Transactions</a>
+                                @Html.ActionLink("Transactions", "Index", "Transfers")
                             </li>
                             <li>
-                                <a href="Wallets">Wallets</a>
+                                @Html.ActionLink("Wallets", "Index", "Wallets")
                             </li>
                             <li>
-                                <a href="Notifications">Notifications</a>
+                                @Html.ActionLink("Notifications", "Index", "Notifications")
                             </li>
 
                         </ul>

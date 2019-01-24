@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using ReflectionIT.Mvc.Paging;
 using TokenNotifier.Data;
@@ -32,19 +33,101 @@ namespace TokenNotifier.Controllers
 
             return View(nfvl);
         }
+        
+        public async Task<IActionResult> Index(string filter="All", int page = 1, string sortExpression = "Notification.DateTime")
+        {
+            List<SelectListItem> filterItems = new List<SelectListItem>();
+            filterItems.Add(new SelectListItem() { Text = "All", Value = "", Selected = true });
+
+            _context.Tokens.OrderBy(x => x.Name).ToList().ForEach(t =>
+            {
+                filterItems.Add(new SelectListItem() { Text = t.Name, Value = t.Name });
+            });
+            ViewBag.FilterValues = filterItems.Select(x => x.Text);
+
+            List<Notification> notificationsForView;
+
+            // Filter
+            if (filter == "All")
+                notificationsForView = _context.Notifications.AsNoTracking().Include(x => x.LinkedWallet).ToList();
+            else
+                notificationsForView = _context.Notifications.AsNoTracking().Where(n => n.Description.Contains("[" + filter)).Include(x => x.LinkedWallet).ToList();
+
+            List<NotificationForView> nfvl = new List<NotificationForView>();
+
+            foreach (Notification n in notificationsForView)
+                nfvl.Add(new NotificationForView(n, n.LinkedWallet.Address, n.LinkedWallet.NameOrAddress));
+
+            var res = nfvl.AsEnumerable();
+            //var model = PagingList.Create(res, 50, page, sortExpression, "Notification.DateTime");
+
+            var model = PagingList.Create(res, 50, page);
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter}
+            };
+
+            return View(model);
+        }
         */
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string sortOrder, string filter = "All", int page = 1)
         {
-            List <NotificationForView> nfvl = new List<NotificationForView>();
-            List<Notification> notifications = await _context.Notifications.OrderByDescending(x => x.DateTime).Include(x => x.LinkedWallet).ToListAsync();
+            List<SelectListItem> filterItems = new List<SelectListItem>();
+            filterItems.Add(new SelectListItem() { Text = "All", Value = "", Selected = true });
+
+            _context.Tokens.OrderBy(x => x.Name).ToList().ForEach(t =>
+             {
+                 filterItems.Add(new SelectListItem() { Text = t.Name, Value = t.Name });
+             });
+            ViewBag.Filter = filterItems.Select(x => x.Text);
+            ViewBag.ChosenFilter = filter;
+            ViewBag.ChosenPage = page;
+
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
+            ViewBag.PriceSortParm = sortOrder == "Price" ? "price_desc" : "Price";
+
+            List<Notification> notificationsForView;
+
+            // Filter
+            if (filter == "All")
+                notificationsForView = _context.Notifications.AsNoTracking().Include(x => x.LinkedWallet).ToList();
+            else
+                notificationsForView = _context.Notifications.AsNoTracking().Where(n => n.Description.Contains("[" + filter)).Include(x => x.LinkedWallet).ToList();
+
+            // Sorting
+            List<NotificationForView> nfvl = new List<NotificationForView>();
+            List<Notification> notifications;
+            switch (sortOrder)
+            {
+                case "price_desc":
+                    notifications = notificationsForView.OrderByDescending(x => x.USDValue).ToList();
+                    break;
+                case "Price":
+                    notifications = notificationsForView.OrderBy(x => x.USDValue).ToList();
+                    break;
+                case "Date":
+                    notifications = notificationsForView.OrderBy(x => x.DateTime).ToList();
+                    break;
+                default:
+                    notifications = notificationsForView.OrderByDescending(x => x.DateTime).ToList();
+                    break;
+            }
+
             foreach (Notification n in notifications)
                 nfvl.Add(new NotificationForView(n, n.LinkedWallet.Address, n.LinkedWallet.NameOrAddress));
 
             var res = nfvl.AsEnumerable();
             var model = PagingList.Create(res, 50, page);
+
+            model.RouteValue = new RouteValueDictionary {
+                { "filter", filter},
+                { "sortOrder", sortOrder }
+            };
+
             return View(model);
         }
+        
 
         // GET: Notifications/Details/5
         public async Task<IActionResult> Details(int? id)
