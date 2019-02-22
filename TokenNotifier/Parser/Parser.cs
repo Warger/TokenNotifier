@@ -49,7 +49,16 @@ namespace TokenNotifier.Parser
             }
 
             // Add new notifications
-            AddNotifications(db, ConvertTime(DateTime.Now.AddHours(-24)), ConvertTime(DateTime.Now));
+            AddTransactionNotifications(db, ConvertTime(DateTime.Now.AddHours(-24)), ConvertTime(DateTime.Now));
+
+            logger.LogDebug("Exchange Update start...");
+            List<WatchedToken> wt = ExchangeUpdater.Update(db);
+            logger.LogDebug("Exchange Update:" + wt.Count+ " new tokens");
+
+            logger.LogDebug("New Token Notifications start...");
+            AddNewTokenNotifications(db, wt);
+            logger.LogDebug("Add New Token Notifications finished");
+
             logger.LogDebug("Parser.Update finished");
         }
 
@@ -59,7 +68,52 @@ namespace TokenNotifier.Parser
             db.SaveChanges();
         }
 
-        private void AddNotifications(DbCryptoContext db, DateTime startTime, DateTime endTime)
+        private void AddNewTokenNotifications(DbCryptoContext db, List<WatchedToken> wt)
+        {
+            // Удаление нетребующих уведомлений обменников
+            List<Exchange> exchangeToNotNotify = db.Exchange.Where(ex => !ex.NotifyOnNextUpdate).ToList();
+            List<Exchange> changeExchangeStatus = new List<Exchange>();
+
+            exchangeToNotNotify.ForEach(etnn => {
+                if (wt.Where(wte => wte.Exchange.ID == etnn.ID).Count() > 0)
+                    changeExchangeStatus.Add(etnn);
+                });
+
+            changeExchangeStatus.ForEach(ces => wt.RemoveAll(t => t.Exchange.ID == ces.ID));
+
+            db.Exchange.Where(ex => changeExchangeStatus.Where(ces => ces.ID == ex.ID).Count() > 0).ToList().ForEach(ex => ex.NotifyOnNextUpdate = true);
+            db.SaveChanges();
+
+            var groupedTokens = wt.GroupBy(t => new { t.Exchange }).Select(g => new
+            {
+                Exchange = g.Key.Exchange,
+                NumberOfTokens = g.Count()
+            });
+            /*
+            foreach (var gt in groupedTokens)
+            {
+                if (gt.NumberOfTokens == 1)
+                    SendSMS(wt.First(watchedToken => watchedToken.Exchange.ID == gt.Exchange.ID).Name + " was added to " + gt.Exchange.Title);
+                else
+                    SendSMS(gt.NumberOfTokens + " new tokens was added to " + gt.Exchange.Title);
+            }
+            */
+
+            foreach (WatchedToken token in wt)
+            {
+                Wallet w = db.Wallets.FirstOrDefault(wal => wal.Address == token.Comment);
+                db.Notifications.Add(new Notification()
+                {
+                    Action = Actions.NewToken,
+                    LinkedWallet = w,
+                    Description = "[" + token.Name + "]. New token on excange " +token.Exchange.Title+ " . Wallet address: " + token.Comment,
+                    DateTime = ConvertTime(DateTime.Now),
+                  });
+                db.SaveChanges();
+            }
+        }
+
+        private void AddTransactionNotifications(DbCryptoContext db, DateTime startTime, DateTime endTime)
         {
             var groupedTransfers = db.Transfers.Where(t => startTime <= t.Date && endTime > t.Date).GroupBy(t => new { t.Token, t.OutgoingAddress }).Select(g => new {
                 Token = g.Key.Token,
@@ -75,7 +129,7 @@ namespace TokenNotifier.Parser
 
                 if (GetTokenNotificationValue(t) <= gt.Value)
                 {
-                    if (db.Notifications.Where(n => gt.Wallet == n.LinkedWallet.Address && n.DateTime.AddHours(24) > ConvertTime(DateTime.Now) && gt.Value <= n.Value*2).Count() != 0)
+                    if (db.Notifications.Where(n => gt.Wallet == n.LinkedWallet.Address && n.DateTime.AddHours(24) > ConvertTime(DateTime.Now) && gt.Value <= n.Value * 2).Count() != 0)
                         continue;
 
                     Wallet w = db.Wallets.SingleOrDefault(wal => wal.Address == gt.Wallet);
@@ -88,13 +142,13 @@ namespace TokenNotifier.Parser
 
                     // Send SMS for big transaction
                     if ((gt.Value / t.TotalSupply) > 0.01)
-                        SendSMS("Trascation for token " + t.Name + " - "+ String.Format("{0:#,##0}", gt.UsdValue) + "$");
+                        SendSMS("Trascation for token " + t.Name + " - " + String.Format("{0:#,##0}", gt.UsdValue) + "$");
 
                     db.Notifications.Add(new Notification()
                     {
                         Action = Actions.BigDailySum,
                         LinkedWallet = w,
-                        Description = "[" + t.Name + "]. Transfer summ per day: " + String.Format("{0:#,##0}", gt.Value) + 
+                        Description = "[" + t.Name + "]. Transfer summ per day: " + String.Format("{0:#,##0}", gt.Value) +
                         " (" + String.Format("{0:#,##0}", gt.UsdValue) + "$)" + " on the wallet: " + gt.Wallet,
                         DateTime = ConvertTime(DateTime.Now),
                         Value = gt.Value,
@@ -108,7 +162,7 @@ namespace TokenNotifier.Parser
 
         private void AddTransactions(DbCryptoContext db, Token t, List<Transfer> transfers)
         {
-            int i=0;
+            int i = 0;
 
             foreach (Transfer tr in transfers)
             {
@@ -143,12 +197,11 @@ namespace TokenNotifier.Parser
                 {
                     using (WebClient wc = new WebClient())
                     {
-                        json = wc.DownloadString(BuildURL(token.Contract, page, trasactionsPerPage));
+                        json = wc.DownloadString(BuildURLForTransactionDownload(token.Contract, page, trasactionsPerPage));
                     }
 
                     dynamic dso = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
                     var transfers = dso.result;
-         
 
                     foreach (var transfer in transfers)
                     {
@@ -176,6 +229,7 @@ namespace TokenNotifier.Parser
                             });
                         }
                     }
+                    System.Threading.Thread.Sleep(1000);
 
                     page++;
                 }
@@ -184,13 +238,13 @@ namespace TokenNotifier.Parser
             }
             catch (Exception e)
             {
-                logger.LogDebug("Exception on GetTransactionsForToken method: " + e.Message + " Stacktrace: "+ e.StackTrace);
+                logger.LogDebug("Exception on GetTransactionsForToken method: " + e.Message + " Stacktrace: " + e.StackTrace);
 
                 return result;
             }
         }
 
-        private string BuildURL(string tokenContract, int page, int transPerPage)
+        private string BuildURLForTransactionDownload(string tokenContract, int page, int transPerPage)
         {
             return "https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=" + tokenContract + "&page=" + page + "&offset=" + transPerPage +
                 "&sort=desc&apikey=6DVU9CM2YCK9IWTCV7I57UABDV1KEBU845";
@@ -266,7 +320,8 @@ namespace TokenNotifier.Parser
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://sms.ru/sms/send?"
                         + queryString.ToString());
 
-                    WebResponse response = request.GetResponse();
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    logger.LogDebug("SendSMS method was called. Status code: " + response.StatusCode + " Status description: " + response.StatusDescription + " SMS text: " + message);
                 }
             }
             catch (Exception e)

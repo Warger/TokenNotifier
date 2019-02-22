@@ -22,18 +22,20 @@ namespace TokenNotifier.Parser
 
             // Get long name
             string fullName = GetStringByTag(resResponse, "<title>\r\n\t");
-            res.Name = fullName.Split(' ')[0];
+            res.Name = fullName.Replace("\r\n", string.Empty);
 
             // Get short name
-            res.ShortName = fullName.Split(' ')[1];
-            res.ShortName = res.ShortName.Substring(1, res.ShortName.Length - 2);
+          //  res.ShortName = fullName.Split(' ')[1];
+           // res.ShortName = res.ShortName.Substring(1, res.ShortName.Length - 2);
 
             // Get decimals
-            string decimals = GetStringByTag(resResponse, "Decimals:&nbsp;\n</td>\n<td>\n", "\n");
+            string decimals = GetStringByTag(resResponse, "Decimals:</div>\n<div class=\"col-md-8\">\n", "\n");
             res.Decimals = int.Parse(decimals);
 
             // Get total supply
-            string supply = GetStringByTag(resResponse, "Supply:</span>\n</td>\n<td class=\"tditem\">\n").Split(' ')[0].Replace(",", string.Empty);
+            string supply = GetStringByTag(resResponse, "Total Supply:</span></div>\n<div class=\"col-md-8 font-weight-medium\">");
+            res.ShortName = supply.Split(' ')[1];
+            supply = supply.Split(' ')[0].Replace(",", string.Empty);
             res.TotalSupply = ulong.Parse(supply);
 
             // Set percent to notification
@@ -71,11 +73,18 @@ namespace TokenNotifier.Parser
             }
 
             // Get long name
-            string price = GetStringByTag(resResponse, "Price:</span></td>\n<td>\n$");
+            string price = GetStringByTag(resResponse, "Price:</span></div>\n<span class=\"d-block\">\n$");
             //   price = price.Split(' ')[0].Replace('.', ',');
             price = price.Split(' ')[0];
 
-            return double.Parse(price);
+            try
+            {
+                return double.Parse(price);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Contract error: "+ contract +". price string = " +price);
+            }
         }
 
 

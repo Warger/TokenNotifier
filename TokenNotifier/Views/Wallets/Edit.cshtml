@@ -29,6 +29,13 @@
                 <span asp-validation-for="Comment" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Exchange" class="control-label"></label>
+                <select asp-for="ExchangeId" class="form-control" asp-items="ViewBag.ExchangeId">
+                    <option value="0">-</option>
+                </select>
+                <span asp-validation-for="Exchange.ID" class="text-danger" />
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </form>

@@ -11,12 +11,22 @@ namespace TokenNotifier.Models
         public string Name { get; set; }
         public string Address { get; set; }
         public string Comment { get; set; }
+        public Exchange Exchange { get; set; }
+        public int? ExchangeId { get; set; }
 
         public string NameOrAddress
         {
             get
             {
                 return Name == null || Name.Length==0 ? Address : Name;
+            }
+        }
+
+        public string GetExcange
+        {
+            get
+            {
+                return Exchange == null ? "No Exchange" : Exchange.Title;
             }
         }
 

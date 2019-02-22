@@ -9,6 +9,8 @@ using ReflectionIT.Mvc.Paging;
 using TokenNotifier.Data;
 using TokenNotifier.Models;
 using TokenNotifier.ViewModels;
+using System.Data.Entity.Infrastructure;
+using TokenNotifier.Parser;
 
 namespace TokenNotifier.Controllers
 {
@@ -22,8 +24,8 @@ namespace TokenNotifier.Controllers
         }
 
         public async Task<IActionResult> Index(int page = 1)
-        {
-            var qry = _context.Wallets.AsNoTracking().OrderBy(x=> x.WalletID);
+        {           
+            var qry = _context.Wallets.AsNoTracking().Include(x => x.Exchange).OrderBy(x=> x.WalletID);
             var model = await PagingList.CreateAsync(qry, 50, page);
             return View(model);
         }
@@ -72,6 +74,7 @@ namespace TokenNotifier.Controllers
         // GET: Wallets/Create
         public IActionResult Create()
         {
+            ExchangesDropDownList();
             return View();
         }
 
@@ -80,14 +83,24 @@ namespace TokenNotifier.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WalletID,Name,Address")] Wallet wallet)
+        public async Task<IActionResult> Create([Bind("WalletID,Name,Address,Comment,ExchangeId")] Wallet wallet)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(wallet);
+                if (wallet.Exchange != null)
+                {
+                    wallet.Exchange.NotifyOnNextUpdate = false;
+                }
+
+                wallet.Exchange = GetExhangeById(wallet.ExchangeId == null ? 0 : (int)wallet.ExchangeId);
+                if (wallet.Exchange == null)
+                    wallet.ExchangeId = null;
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ExchangesDropDownList(wallet.Exchange);
             return View(wallet);
         }
 
@@ -104,15 +117,17 @@ namespace TokenNotifier.Controllers
             {
                 return NotFound();
             }
+            ExchangesDropDownList(wallet.Exchange);
+
             return View(wallet);
         }
 
         // POST: Wallets/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WalletID,Name,Address")] Wallet wallet)
+        public async Task<IActionResult> Edit(int id, [Bind("WalletID,Name,Address,Comment,ExchangeId")] Wallet wallet)
         {
             if (id != wallet.WalletID)
             {
@@ -124,9 +139,20 @@ namespace TokenNotifier.Controllers
                 try
                 {
                     _context.Update(wallet);
+
+                    wallet.Exchange = GetExhangeById(wallet.ExchangeId == null ? 0 : (int)wallet.ExchangeId);
+
+                    if (wallet.Exchange != null)
+                    {
+                        wallet.Exchange.NotifyOnNextUpdate = false;
+                    }
+                    else
+                    {
+                        wallet.ExchangeId = null;
+                    }
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (System.Data.Entity.Infrastructure.DbUpdateConcurrencyException)
                 {
                     if (!WalletExists(wallet.WalletID))
                     {
@@ -139,6 +165,8 @@ namespace TokenNotifier.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ExchangesDropDownList(wallet.Exchange);
+
             return View(wallet);
         }
 
@@ -174,6 +202,19 @@ namespace TokenNotifier.Controllers
         private bool WalletExists(int id)
         {
             return _context.Wallets.Any(e => e.WalletID == id);
+        }
+
+        private void ExchangesDropDownList(object selectedExchanges = null)
+        {
+            var exhangesQuery = from d in _context.Exchange
+                                   orderby d.Title
+                                   select d;
+            ViewBag.ExchangeID = new SelectList(exhangesQuery, "ID", "Title", selectedExchanges);
+        }
+
+        private Exchange GetExhangeById(int id)
+        {
+            return _context.Exchange.FirstOrDefault(e => e.ID == id);
         }
     }
 }

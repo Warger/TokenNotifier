@@ -23,19 +23,15 @@ namespace TokenNotifier.Parser
 
         public async Task Execute()
         {
-            logger.LogDebug("Caling await Execute(). ISProcessing:" + (isProcessing ? "true" : "false"));
+            logger.LogDebug("Caling await Execute(). ISProcessing: " + (isProcessing ? "true" : "false"));
 
             if (isProcessing)
                 return;
 
+          //  return;
+
             try
             {
-                /*
-                using (WebClient wc = new WebClient())
-                {
-                  var json = wc.DownloadString("https://ec2-18-216-22-23.us-east-2.compute.amazonaws.com/Transfers/Update");
-                }
-                */
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     logger.LogDebug("Caling await Update(scope.ServiceProvider) ...");

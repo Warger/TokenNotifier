@@ -19,6 +19,8 @@ namespace TokenNotifier.Data
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
+        public DbSet<TokenNotifier.Models.Exchange> Exchange { get; set; }
+        public DbSet<WatchedToken> WatchedTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,6 +30,9 @@ namespace TokenNotifier.Data
             modelBuilder.Entity<Wallet>().ToTable("Wallet");
             modelBuilder.Entity<Token>().ToTable("Token");
             modelBuilder.Entity<Transfer>().ToTable("Transfer");
+            modelBuilder.Entity<Exchange>().ToTable("Exchange");
+            modelBuilder.Entity<WatchedToken>().ToTable("WatchedToken");
+
         }
     }
 }

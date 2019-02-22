@@ -1,0 +1,53 @@
+﻿@model TokenNotifier.ViewModels.ExchangeForView
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Exchange</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Exchange.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Exchange.Title)
+        </dd>
+    </dl>
+
+    <hr />
+    <div style="height:600px;overflow-y:scroll">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Token
+                    </th>
+                    <th>
+                        Added time
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Tokens)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TokenName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AddDateTime)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Exchange.ID">Edit</a>  |
+        <input type="button" title="Update Exchange" value="Update exchange token" onclick="location.href='@Url.Action("UpdateExchange", "Exchanges", new { id = Model.Exchange.ID })'" />  |
+        <a asp-action="Index">Back to List</a>
+    </div>
