@@ -32,7 +32,10 @@ namespace TokenNotifier.Data
             modelBuilder.Entity<Transfer>().ToTable("Transfer");
             modelBuilder.Entity<Exchange>().ToTable("Exchange");
             modelBuilder.Entity<WatchedToken>().ToTable("WatchedToken");
-
+            modelBuilder.Entity<TwitterAccount>().ToTable("TwitterAccount");
         }
+
+
+        public DbSet<TokenNotifier.Models.TwitterAccount> TwitterAccount { get; set; }
     }
 }

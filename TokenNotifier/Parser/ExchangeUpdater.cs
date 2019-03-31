@@ -47,7 +47,7 @@ namespace TokenNotifier.Parser
                         }
                         else
                         {
-                            if (wt.FirstOrDefault(t => t.Name == token.Name) != null && counterTokens.Where(t=>t.Name == token.Name).Count() == 0 && 
+                            if (wt.FirstOrDefault(t => t.Name == token.Name) != null && counterTokens.Where(t => t.Name == token.Name).Count() == 0 &&
                                 res.Where(t => t.Name == token.Name).Count() == 0)
                             {
                                 counterTokens.Add(wt.FirstOrDefault(t => t.Name == token.Name));
@@ -70,17 +70,12 @@ namespace TokenNotifier.Parser
                             resTwoEntries.Add(tfu);
                     }
                 }
-
-              /*  foreach (WatchedToken tkn in tokensToRemove)
-                {
-                    if (res.Where(t=>t.ShortName == tkn.ShortName).Count() != 0)
-                        tokensToRemove.Remove(tkn);
-                }*/
-                db.WatchedTokens.RemoveRange(db.WatchedTokens.Where(t => t.Counter == 0));
-                db.SaveChanges();
-                res.ForEach(rt => db.WatchedTokens.Add(rt));
-                db.SaveChanges();
             }
+
+            db.WatchedTokens.RemoveRange(db.WatchedTokens.Where(t => t.Counter == 0));
+            db.SaveChanges();
+            res.ForEach(rt => db.WatchedTokens.Add(rt));
+            db.SaveChanges();
 
             //тут фильтровать, если дохуя возвращается новых токенов
             return resTwoEntries;

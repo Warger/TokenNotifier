@@ -7,7 +7,7 @@ namespace TokenNotifier.Models
 {
     public enum Actions
     {
-        BigDailySum,NewToken, Other
+        BigDailySum,NewToken,NewTweet, Other
     }
 
     public class Notification

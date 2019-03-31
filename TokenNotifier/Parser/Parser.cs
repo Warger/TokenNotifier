@@ -59,6 +59,10 @@ namespace TokenNotifier.Parser
             AddNewTokenNotifications(db, wt);
             logger.LogDebug("Add New Token Notifications finished");
 
+            logger.LogDebug("New Token Tweet Notifications updating...");
+            TwitterParser.Update(db);
+            logger.LogDebug("Add New Token Tweet Notifications finished");
+
             logger.LogDebug("Parser.Update finished");
         }
 
