@@ -24,7 +24,8 @@ namespace TokenNotifier.Parser
             logger = _logger;
             logger.LogDebug("Parser.Update starting...");
 
-            foreach (Token t in db.Tokens)
+            List<Token> tokens = db.Tokens.ToList();
+            foreach (Token t in tokens)
             {
                 if (!t.IsObserved)
                     continue;
@@ -37,7 +38,15 @@ namespace TokenNotifier.Parser
                     db.SaveChanges();
                 }
 
-                double price = TokenParser.GetPriceByContract(t.Contract);
+                double price = 0;
+                try
+                {
+                    price = TokenParser.GetPriceByContract(t.Contract, _logger);
+                }
+                catch(Exception e)
+                {
+                    continue;
+                }
 
                 // Add new trascations
                 Transfer lastTransfer = db.Transfers.Where(ft => ft.Token == t.Contract).OrderBy(ft => ft.Date).LastOrDefault();
@@ -275,7 +284,7 @@ namespace TokenNotifier.Parser
         {
             string resResponse;
             double res = -1;
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(1000);
 
             try
             {
@@ -345,6 +354,8 @@ namespace TokenNotifier.Parser
             string result = String.Empty;
             try
             {
+                System.Threading.Thread.Sleep(5000);
+
                 using (WebClient wc = new WebClient())
                 {
                     walletPage = wc.DownloadString("https://etherscan.io/address/" + address);

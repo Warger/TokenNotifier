@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using TokenNotifier.Models;
+using Microsoft.Extensions.Logging;
+
 
 namespace TokenNotifier.Parser
 {
@@ -13,6 +15,8 @@ namespace TokenNotifier.Parser
         {
             string resResponse;
             Token res = new Token();
+            System.Threading.Thread.Sleep(5000);
+
             using (WebClient wc = new WebClient())
             {
                 resResponse = wc.DownloadString("https://etherscan.io/token/" + contract);
@@ -64,12 +68,21 @@ namespace TokenNotifier.Parser
             return res;
         }
 
-        public static double GetPriceByContract(string contract)
+        public static double GetPriceByContract(string contract, ILogger _logger)
         {
+            System.Threading.Thread.Sleep(5000);
+
             string resResponse;
-            using (WebClient wc = new WebClient())
+            try
             {
-                resResponse = wc.DownloadString("https://etherscan.io/token/" + contract);
+                using (WebClient wc = new WebClient())
+                {
+                    resResponse = wc.DownloadString("https://etherscan.io/token/" + contract);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Contract getting etherscan error. Address " + "https://etherscan.io/token/" + contract + " Exception message: " +e.Message);
             }
 
             // Get long name
